@@ -1,0 +1,9 @@
+# @package _group_
+
+# train
+train:
+  num_epochs: 2
+  batch_size: 1
+  sequence_length: 2
+  img_dim: 112
+  num_workers: 0

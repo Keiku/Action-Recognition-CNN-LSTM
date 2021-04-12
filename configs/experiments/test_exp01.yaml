@@ -1,0 +1,5 @@
+# @package _group_
+
+# test
+test:
+  checkpoint_model: '/mnt/nfs/kuroyanagi/clones/Action-Recognition-CNN-LSTM/experiments/exp01/model_checkpoints/ConvLSTM_45.pth'

@@ -1,0 +1,55 @@
+defaults:
+  - hydra/job_logging: colorlog
+  - hydra/hydra_logging: colorlog
+
+hydra:
+  run:
+    dir: ./outputs
+  output_subdir: ./configs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    name: log_${now:%Y-%m-%d}_${now:%H-%M-%S}
+
+# datasets
+dataset:
+  root: '/mnt/nfs/kuroyanagi/clones/Action-Recognition-CNN-LSTM/data'
+  name: 'UCF-101'
+  frames: 'UCF-101-frames'
+  split_file: 'ucfTrainTestlist'
+  split_number: 1
+
+# train
+train:
+  num_epochs: 100
+  batch_size: 16
+  sequence_length: 40
+  image_height: 224
+  image_width: 224
+  channels: 3
+  latent_dim: 512
+  lstm_layers: 1
+  hidden_dim: 1024
+  bidirectional: True
+  attention: True
+  num_workers: 4
+  checkpoint_model: ''
+  checkpoint_interval: 5
+  checkpoints_dir: 'checkpoints'
+  tensorboard_dir: 'logs'
+  resume: True
+
+# test or test_on_video
+test:
+  num_classes: 101
+  batch_size: 16
+  sequence_length: 40
+  image_height: 224
+  image_width: 224
+  channels: 3
+  latent_dim: 512
+  lstm_layers: 1
+  hidden_dim: 1024
+  bidirectional: True
+  attention: True
+  num_workers: 4
+  checkpoint_model: '/mnt/nfs/kuroyanagi/clones/Action-Recognition-CNN-LSTM/experiments/exp01/model_checkpoints/ConvLSTM_45.pth'
+  video_name: 'BabyCrawling/v_BabyCrawling_g01_c01.avi'

@@ -2,4 +2,4 @@
 
 # test
 test:
-  checkpoint_model: '/mnt/nfs/kuroyanagi/clones/Action-Recognition-CNN-LSTM/experiments/exp01/model_checkpoints/ConvLSTM_45.pth'
+  checkpoint_model: '/mnt/nfs/kuroyanagi/clones/Action-Recognition-CNN-LSTM/outputs/train/exp01/checkpoints/checkpoint_0050.pth'

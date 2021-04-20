@@ -25,14 +25,13 @@ class Dataset(Dataset):
         sequence_length,
         training,
     ):
-        self.label_index = self._extract_label_mapping(split_path)
-        self.sequences = self._extract_sequence_paths(
+        self.label_mapping = self._extract_label_mapping(split_path)
+        self.sequence_paths = self._extract_sequence_paths(
             dataset_path, split_path, split_number, training
         )
         self.label_names = sorted(
-            list(
-                set([self._activity_from_path(seq_path) for seq_path in self.sequences])
-            )
+            list(set([self._activity_from_path(seq_path) \
+                      for seq_path in self.sequence_paths]))
         )
         self.num_classes = len(self.label_names)
         self.sequence_length = sequence_length
@@ -115,17 +114,19 @@ class Dataset(Dataset):
         return sequence
 
     def __getitem__(self, index):
-        start = time.time()
+        # NOTE: Is this implementation correct?
         # sequence_path = self.sequences[index % len(self)]
-        sequence_path = self.sequences[index]
+        sequence_path = self.sequence_paths[index]
 
         # Sort frame sequence based on frame number
         image_paths = sorted(
             glob.glob(f"{sequence_path}/*.jpg"),
             key=lambda path: self._frame_number(path),
         )
+
         # Pad frames sequences shorter than `self.sequence_length` to length
         image_paths = self._pad_to_length(image_paths)
+
         if self.training:
             # Randomly choose sample interval and start frame
             sample_interval = np.random.randint(
@@ -144,9 +145,11 @@ class Dataset(Dataset):
                 else len(image_paths) // self.sequence_length
             )
             flip = False
+
         # Extract frames as tensors
         image_sequence = []
         for i in range(start_i, len(image_paths), sample_interval):
+            # Append up to sequence_length
             if (
                 self.sequence_length is None
                 or len(image_sequence) < self.sequence_length
@@ -157,8 +160,9 @@ class Dataset(Dataset):
                     image_tensor = torch.flip(image_tensor, (-1,))
                 image_sequence.append(image_tensor)
         image_sequence = torch.stack(image_sequence)
-        target = self.label_index[self._activity_from_path(sequence_path)]
+        target = self.label_mapping[self._activity_from_path(sequence_path)]
+
         return image_sequence, target
 
     def __len__(self):
-        return len(self.sequences)
+        return len(self.sequence_paths)

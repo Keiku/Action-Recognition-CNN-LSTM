@@ -2,17 +2,17 @@
 Helper script for extracting frames from the UCF-101 dataset
 """
 
-import av
+import argparse
+import datetime
 import glob
 import os
 import time
+
+import av
 import tqdm
-import datetime
-import argparse
 
 
 def extract_frames(video_path):
-    frames = []
     video = av.open(video_path)
     for frame in video.decode(0):
         yield frame.to_image()
@@ -21,7 +21,9 @@ def extract_frames(video_path):
 prev_time = time.time()
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset_path", type=str, default="UCF-101", help="Path to UCF-101 dataset")
+    parser.add_argument(
+        "--dataset_path", type=str, default="UCF-101", help="Path to UCF-101 dataset"
+    )
     opt = parser.parse_args()
     print(opt)
 
@@ -29,7 +31,9 @@ if __name__ == "__main__":
     video_paths = glob.glob(os.path.join(opt.dataset_path, "*", "*.avi"))
     for i, video_path in enumerate(video_paths):
         sequence_type, sequence_name = video_path.split(".avi")[0].split("/")[-2:]
-        sequence_path = os.path.join(f"{opt.dataset_path}-frames", sequence_type, sequence_name)
+        sequence_path = os.path.join(
+            f"{opt.dataset_path}-frames", sequence_type, sequence_name
+        )
 
         if os.path.exists(sequence_path):
             continue

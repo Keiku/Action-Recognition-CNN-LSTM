@@ -1,9 +1,7 @@
 import argparse
 import datetime
 import logging
-import itertools
 import sys
-import time
 from pathlib import Path
 
 import hydra
@@ -35,7 +33,7 @@ def main(cfg: DictConfig) -> None:
     # NOTE: hydra causes the python file to run in hydra.run.dir by default
     logger.info(f"Run script in {HydraConfig.get().run.dir}")
 
-    assert cfg.test.checkpoint_model is not '', "Specify path to checkpoint model"
+    assert cfg.test.checkpoint_model is not "", "Specify path to checkpoint model"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -44,8 +42,10 @@ def main(cfg: DictConfig) -> None:
     # NOTE: With hydra, the python file runs in hydra.run.dir by default, so set the dataset path to a full path or an appropriate relative path
     dataset_path = Path(cfg.dataset.root) / cfg.dataset.frames
     split_path = Path(cfg.dataset.root) / cfg.dataset.split_file
-    assert dataset_path.exists(), 'Video image folder not found'
-    assert split_path.exists(), 'The file that describes the split of train/test not found.'
+    assert dataset_path.exists(), "Video image folder not found"
+    assert (
+        split_path.exists()
+    ), "The file that describes the split of train/test not found."
 
     # Define test set
     test_dataset = Dataset(
@@ -77,8 +77,9 @@ def main(cfg: DictConfig) -> None:
         bidirectional=cfg.test.bidirectional,
         attention=cfg.test.attention,
     )
-    model = model.to(device)
-    model.load_state_dict(torch.load(cfg.test.checkpoint_model))
+    ckpt = torch.load(cfg.test.checkpoint_model, map_location="cpu")
+    model.load_state_dict(ckpt["model"])
+    model.to(device)
     model.eval()
 
     test_metrics = {"loss": [], "acc": []}

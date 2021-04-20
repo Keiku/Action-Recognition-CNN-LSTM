@@ -2,7 +2,6 @@ import argparse
 import datetime
 import logging
 import sys
-import time
 from pathlib import Path
 
 import hydra
@@ -49,8 +48,10 @@ def main(cfg: DictConfig) -> None:
     # NOTE: With hydra, the python file runs in hydra.run.dir by default, so set the dataset path to a full path or an appropriate relative path
     dataset_path = Path(cfg.dataset.root) / cfg.dataset.frames
     split_path = Path(cfg.dataset.root) / cfg.dataset.split_file
-    assert dataset_path.exists(), 'Video image folder not found'
-    assert split_path.exists(), 'The file that describes the split of train/test not found.'
+    assert dataset_path.exists(), "Video image folder not found"
+    assert (
+        split_path.exists()
+    ), "The file that describes the split of train/test not found."
 
     # Define training set
     train_dataset = Dataset(
@@ -104,26 +105,28 @@ def main(cfg: DictConfig) -> None:
 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
 
-    checkpointer = Checkpointer(model,
-                                optimizer=optimizer,
-                                # scheduler=scheduler,
-                                save_dir=cfg.train.checkpoints_dir,
-                                save_to_disk=True)
+    checkpointer = Checkpointer(
+        model,
+        optimizer=optimizer,
+        # scheduler=scheduler,
+        save_dir=cfg.train.checkpoints_dir,
+        save_to_disk=True,
+    )
 
     if cfg.train.resume:
         if not checkpointer.has_checkpoint():
             start_epoch = 0
         else:
-            ckpt = checkpointer.resume_or_load('', resume=True)
-            start_epoch = ckpt['epoch']
+            ckpt = checkpointer.resume_or_load("", resume=True)
+            start_epoch = ckpt["epoch"]
             model.to(device)
             for state in optimizer.state.values():
                 for k, v in state.items():
                     if isinstance(v, torch.Tensor):
                         state[k] = v.to(device)
-    elif cfg.train.checkpoint_model != '':
-        ckpt = torch.load(cfg.train.checkpoint_model, map_location='cpu')
-        model.load_state_dict(ckpt['model'])
+    elif cfg.train.checkpoint_model != "":
+        ckpt = torch.load(cfg.train.checkpoint_model, map_location="cpu")
+        model.load_state_dict(ckpt["model"])
         model.to(device)
         start_epoch = 0
     else:
@@ -198,8 +201,8 @@ def main(cfg: DictConfig) -> None:
                 acc = (predictions.detach().argmax(1) == labels).cpu().numpy().mean()
 
                 # Keep track of loss and accuracy
-                test_metrics['loss'].append(loss.item())
-                test_metrics['acc'].append(acc)
+                test_metrics["loss"].append(loss.item())
+                test_metrics["acc"].append(acc)
 
                 # Determine approximate time left
                 batches_done = batch_i - 1
@@ -222,7 +225,7 @@ def main(cfg: DictConfig) -> None:
 
         # Save model checkpoint
         if epoch % cfg.train.checkpoint_interval == 0:
-            checkpointer.save(f'checkpoint_{epoch:04}', epoch=epoch)
+            checkpointer.save(f"checkpoint_{epoch:04}", epoch=epoch)
 
     writer.close()
 

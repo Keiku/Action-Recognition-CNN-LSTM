@@ -26,7 +26,7 @@ train:
   image_width: 224
   channels: 3
   latent_dim: 512
-  lstm_layers: 1
+  lstm_layers: 3
   hidden_dim: 1024
   bidirectional: True
   attention: True
@@ -46,10 +46,10 @@ test:
   image_width: 224
   channels: 3
   latent_dim: 512
-  lstm_layers: 1
+  lstm_layers: 3
   hidden_dim: 1024
   bidirectional: True
   attention: True
   num_workers: 4
-  checkpoint_model: '/mnt/nfs/kuroyanagi/clones/Action-Recognition-CNN-LSTM/experiments/exp01/model_checkpoints/ConvLSTM_45.pth'
+  checkpoint_model: ''
   video_name: 'BabyCrawling/v_BabyCrawling_g01_c01.avi'

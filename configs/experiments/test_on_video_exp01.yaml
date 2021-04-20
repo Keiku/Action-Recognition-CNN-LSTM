@@ -2,4 +2,5 @@
 
 # input video
 test:
+  checkpoint_model: '/mnt/nfs/kuroyanagi/clones/Action-Recognition-CNN-LSTM/outputs/train/exp01/checkpoints/checkpoint_0050.pth'
   video_name: 'ApplyEyeMakeup/v_ApplyEyeMakeup_g25_c07.avi'

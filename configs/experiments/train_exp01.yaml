@@ -2,8 +2,8 @@
 
 # train
 train:
-  batch_size: 8
-  num_epochs: 10
-  sequence_length: 20
+  batch_size: 16
+  num_epochs: 50
+  sequence_length: 40
   checkpoint_interval: 5
   num_workers: 4

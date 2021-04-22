@@ -114,8 +114,7 @@ class Dataset(Dataset):
         return sequence
 
     def __getitem__(self, index):
-        # NOTE: Is this implementation correct?
-        # sequence_path = self.sequences[index % len(self)]
+        # Set index in mini-batch
         sequence_path = self.sequence_paths[index]
 
         # Sort frame sequence based on frame number

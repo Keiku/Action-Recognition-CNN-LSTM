@@ -33,7 +33,7 @@ def main(cfg: DictConfig) -> None:
     # NOTE: hydra causes the python file to run in hydra.run.dir by default
     logger.info(f"Run script in {HydraConfig.get().run.dir}")
 
-    assert cfg.test.checkpoint_model is not "", "Specify path to checkpoint model"
+    assert cfg.test.checkpoint_model != "", "Specify path to checkpoint model"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

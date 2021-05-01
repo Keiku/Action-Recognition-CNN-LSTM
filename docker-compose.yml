@@ -1,0 +1,25 @@
+version: "2.3"
+services:
+  dev:
+    image: ubuntu20-cuda11-py38
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        UID: ${UID}
+        TIMEZONE: Asia/Tokyo
+        PYTHON_VERSION: 3.7.9
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    tty: true
+    working_dir: /work
+    volumes:
+      - $PWD:/work
+      - /mnt:/mnt
+    ports:
+      - 8888:8888 # jupyter notebook
+    hostname: ${HOSTNAME}_docker
+    ipc: host
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all

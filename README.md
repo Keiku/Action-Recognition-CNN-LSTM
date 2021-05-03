@@ -1,55 +1,113 @@
-# Action Recognition in Video
+# Action Recognition in CNN-LSTM
 
-This repo will serve as a playground where I investigate different approaches to solving the problem of action recognition in video.
+This repository is a tutorial on the CNN-LSTM model of Action recognition using the UCF101 dataset. This is a refactored repository of [eriklindernoren/Action-Recognition](https://github.com/eriklindernoren/Action-Recognition). I'm glad if you can use it as a reference.
 
-I will mainly use the [UCF-101 dataset](https://www.crcv.ucf.edu/data/UCF101.php).
+## Dataset
 
-<p align="center">
-    <img src="assets/crawling.gif" width="400"\>
-</p>
+Details of UCF101 can be found at the following link. [UCF101 - Action Recognition Data Set](https://www.crcv.ucf.edu/data/UCF101.php).
 
-## Setup
+## Instalation
 
-```
-$ cd data/              
-$ bash download_ucf101.sh     # Downloads the UCF-101 dataset (~7.2 GB)
-$ unrar x UCF101.rar          # Unrars dataset
-$ unzip ucfTrainTestlist.zip  # Unzip train / test split
-$ python3 extract_frames.py   # Extracts frames from the video (~26.2 GB, go grab a coffee for this)
-```
+I run in the following environment. If you have a similar environment, you can prepare the environment immediately with pipenv.
 
-## ConvLSTM
-
-The only approach investigated so far. Enables action recognition in video by a bi-directional LSTM operating on frame embeddings extracted by a pre-trained ResNet-152 (ImageNet).
-
-The model is composed of:
-* A convolutional feature extractor (ResNet-152) which provides a latent representation of video frames
-* A bi-directional LSTM classifier which based on the latent representation of the video predicts the activity depicted
-
-I have made a trained model available [here](https://drive.google.com/open?id=1GlpN0m9uLbI9dg1ARbW9hDEf-VWe4Asl).
-
-### Train  
+* Ubuntu 20.04.1 LTS
+* CUDA Version 11.0
+* Python 3.8.5
 
 ```
-$ python3 train.py  --dataset_path data/UCF-101-frames/ \
-                    --split_path data/ucfTrainTestlist \
-                    --num_epochs 200 \
-                    --sequence_length 40 \
-                    --img_dim 112 \
-                    --latent_dim 512
+$ pip install pipenv
+$ pipenv sync
+```
+
+If you do not have a cuda environment, please use Docker. Build docker with the following command.
+
+```
+$ docker-compose up -d dev
+```
+
+Run docker with the following command.
+
+```
+$ docker run --rm -it --runtime=nvidia \
+      -v /mnt/:/mnt \
+      -v /home/kuroyanagi/clones/Action-Recognition-CNN-LSTM/:/work/Action-Recognition-CNN-LSTM \
+      -u (id -u):(id -g) \
+      -e HOSTNAME=(hostname) \
+      -e HOME=/home/docker \
+      --workdir /work/Action-Recognition-CNN-LSTM \
+      --ipc host \
+      ubuntu20-cuda11-py38 bash
+```
+
+### Prepare dataset
+
+```
+$ cd data/
+$ bash download_ucf101.sh # Downloads the UCF-101 dataset (~7.2 GB)
+$ python extract_frames.py # Extracts frames from the video (~26.2 GB)
+```
+
+### CNN-LSTM
+
+The original repository defined the model as ConvLSTM, but it was renamed because CNNLSTM is correct.
+
+What is the difference between ConvLSTM and CNN LSTM? - Quora https://www.quora.com/What-is-the-difference-between-ConvLSTM-and-CNN-LSTM
+
+### Train
+
+`train.py` performs training/validation according to the specified config. A checkpoint for each epoch is saved and evaluated for validation.
+
+To execute the experiment of `configs/experiments/train_exp01.yaml`, execute as follows. Specify the output destination as `hydra.run.dir=outputs/train/exp01`.
+
+```
+$ pipenv run python train.py +experiments=train_exp01 hydra.run.dir=outputs/train/exp01
+```
+
+If you use Docker, execute the following command.
+
+```
+$ export TORCH_HOME=/home/docker
+$ python train.py +experiments=train_exp01 hydra.run.dir=outputs/train/exp01
+```
+
+### Test
+
+`test.py` performs only inference for a checkpoint. The specifications of config and output are the same as train.
+
+```
+$ pipenv run python test.py +experiments=test_exp01 hydra.run.dir=outputs/test/exp01
 ```
 
 ### Test on Video
 
+`test_on_video.py` makes inferences for a video.
+
 ```
-$ python3 test_on_video.py  --video_path data/UCF-101/SoccerPenalty/v_SoccerPenalty_g01_c01.avi \
-                            --checkpoint_model model_checkpoints/ConvLSTM_150.pth
+$ pipenv run python test_on_video.py +experiments=test_on_video_exp01 hydra.run.dir=outputs/test_on_video/exp01
 ```
 
 <p align="center">
-    <img src="assets/penalty.gif" width="400"\>
+    <img src="results/v_BabyCrawling_g01_c01.gif" width="400"\>
 </p>
 
 ### Results
 
-The model reaches a classification accuracy of **91.27%** accuracy on a randomly sampled test set, composed of 20% of the total amount of video sequences from UCF-101. Will re-train this model on the offical train / test splits and post results as soon as I have time.
+The results of TensorBoard in split 1 are as follows.
+
+![tensorboard](results/tensorboard.png)
+
+### References
+
+* [eriklindernoren/Action-Recognition](https://github.com/eriklindernoren/Action-Recognition)
+* CNN–LSTM Architecture for Action Recognition in Videos http://170.210.201.137/pdfs/saiv/SAIV-02.pdf
+* What is the difference between ConvLSTM and CNN LSTM? - Quora https://www.quora.com/What-is-the-difference-between-ConvLSTM-and-CNN-LSTM
+
+
+### TODOs
+
+- [x] fix bug of original repository
+- [x] Docker and pipenv
+- [x] check code format with black, isort, vulture
+- [x] hydra and color logger
+- [x] TensorBoard
+- [] PyTorch Lightning and wandb

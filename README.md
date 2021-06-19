@@ -96,6 +96,14 @@ The results of TensorBoard in split 1 are as follows.
 
 ![tensorboard](results/tensorboard.png)
 
+### Hydra color log
+
+This repository also sets up a beautiful hydra color log.
+
+<p align="center">
+    <img src="results/hydra_color_log.gif" width="640"\>
+</p>
+
 ### References
 
 * [eriklindernoren/Action-Recognition](https://github.com/eriklindernoren/Action-Recognition)

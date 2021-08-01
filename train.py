@@ -167,10 +167,11 @@ def main(cfg: DictConfig) -> None:
             batches_done = (epoch - 1) * len(train_dataloader) + (batch_i - 1)
             batches_left = cfg.train.num_epochs * len(train_dataloader) - batches_done
             time_left = datetime.timedelta(seconds=batches_left * timer.seconds())
+            time_iter = round(timer.seconds(), 3)
             timer.reset()
 
             logger.info(
-                f'Training - [Epoch: {epoch}/{cfg.train.num_epochs}] [Batch: {batch_i}/{len(train_dataloader)}] [Loss: {np.mean(epoch_metrics["loss"]):.3f}] [Acc: {np.mean(epoch_metrics["acc"]):.3f}] [ETA: {time_left}]'
+                f'Training - [Epoch: {epoch}/{cfg.train.num_epochs}] [Batch: {batch_i}/{len(train_dataloader)}] [Loss: {np.mean(epoch_metrics["loss"]):.3f}] [Acc: {np.mean(epoch_metrics["acc"]):.3f}] [ETA: {time_left}] [Iter time: {time_iter}s/it]'
             )
 
             # Empty cache
@@ -208,11 +209,12 @@ def main(cfg: DictConfig) -> None:
                 batches_done = batch_i - 1
                 batches_left = len(test_dataloader) - batches_done
                 time_left = datetime.timedelta(seconds=batches_left * timer.seconds())
+                time_iter = round(timer.seconds(), 3)
                 timer.reset()
 
                 # Log test performance
                 logger.info(
-                    f'Testing - [Epoch: {epoch}/{cfg.train.num_epochs}] [Batch: {batch_i}/{len(test_dataloader)}] [Loss: {np.mean(test_metrics["loss"]):.3f}] [Acc: {np.mean(test_metrics["acc"]):.3f}] [ETA: {time_left}]'
+                    f'Testing - [Epoch: {epoch}/{cfg.train.num_epochs}] [Batch: {batch_i}/{len(test_dataloader)}] [Loss: {np.mean(test_metrics["loss"]):.3f}] [Acc: {np.mean(test_metrics["acc"]):.3f}] [ETA: {time_left}] [Iter time: {time_iter}s/it]'
                 )
 
             writer.add_scalar("test/loss", np.mean(test_metrics["loss"]), epoch)

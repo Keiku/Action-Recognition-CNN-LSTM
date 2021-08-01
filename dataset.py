@@ -154,7 +154,7 @@ class Dataset(Dataset):
                 or len(image_sequence) < self.sequence_length
             ):
                 image = Image.open(image_paths[i])
-                image_tensor = self.transform(Image.open(image_paths[i]))
+                image_tensor = self.transform(image)
                 if flip:
                     image_tensor = torch.flip(image_tensor, (-1,))
                 image_sequence.append(image_tensor)

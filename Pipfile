@@ -19,6 +19,7 @@ fvcore = "*"
 typing-extensions = "*"
 urllib3 = "==1.26.5"
 omegaconf = "==2.0.1"
+pillow = ">=8.3.2"
 
 [dev-packages]
 isort = "*"
